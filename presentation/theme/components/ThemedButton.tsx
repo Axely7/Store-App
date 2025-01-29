@@ -20,15 +20,12 @@ const ThemedButton = ({ icon, children, ...rest }: Props) => {
 
   return (
     <Pressable
-      style={{
-        backgroundColor: primaryColor,
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: 5,
-        paddingVertical: 10,
-        borderRadius: 8,
-      }}
+      style={({ pressed }) => [
+        {
+          backgroundColor: pressed ? primaryColor + "90" : primaryColor,
+        },
+        styles.button,
+      ]}
     >
       <Text
         style={{
@@ -42,7 +39,7 @@ const ThemedButton = ({ icon, children, ...rest }: Props) => {
           name={icon}
           size={24}
           color={"white"}
-          style={{ marginLeft: 5 }}
+          style={{ marginHorizontal: 5 }}
         />
       )}
     </Pressable>
@@ -50,3 +47,14 @@ const ThemedButton = ({ icon, children, ...rest }: Props) => {
 };
 
 export default ThemedButton;
+
+const styles = StyleSheet.create({
+  button: {
+    paddingHorizontal: 10,
+    paddingVertical: 15,
+    borderRadius: 5,
+    alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "center",
+  },
+});
