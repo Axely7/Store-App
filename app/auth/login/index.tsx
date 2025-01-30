@@ -28,6 +28,7 @@ const LoginScreen = () => {
 
   const onLogin = async () => {
     const { email, password } = form;
+    console.log(form);
     if (email.length === 0 || password.length === 0) return;
     setIsPosting(true);
 
@@ -81,7 +82,13 @@ const LoginScreen = () => {
           />
         </View>
         <View style={{ marginTop: 10 }} />
-        <ThemedButton icon="arrow-forward-outline">Ingresar</ThemedButton>
+        <ThemedButton
+          icon="arrow-forward-outline"
+          onPress={onLogin}
+          disabled={isPosting}
+        >
+          Ingresar
+        </ThemedButton>
         <View style={{ marginTop: 50 }} />
         <View
           style={{

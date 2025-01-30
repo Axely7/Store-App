@@ -22,7 +22,8 @@ const returnUserToken = (data: AuthResponse): {user: User, token: string} => {
         email,
         fullName,
         isActive,
-        roles
+        roles,
+        
     }
 
     return {
