@@ -1,6 +1,7 @@
+import { SecureStorageAdapter } from '@/helpers/adapters/secure-storage.adapter';
 import axios from 'axios'
 import { Platform } from 'react-native';
-import { SecureStorageAdapter } from '../../../helpers/adapters/secure-storage.adapter';
+
 
 const STAGE = process.env.EXPO_PUBLIC_STAGE || 'dev'
 
