@@ -13,7 +13,7 @@ export interface Product {
     gender:      Gender;
     tags:        string[];
     images:      string[];
-    user:        User;
+    use?:        User;
 }
 
 export enum Gender {

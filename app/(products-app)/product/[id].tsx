@@ -1,6 +1,5 @@
 import {
   View,
-  Text,
   ScrollView,
   KeyboardAvoidingView,
   Platform,
@@ -17,6 +16,7 @@ import ThemeButtonGroup from "@/presentation/theme/components/ThemedButtonGroup"
 import ThemedButton from "@/presentation/theme/components/ThemedButton";
 import { Formik } from "formik";
 import { Size } from "@/core/products/interfaces/product.interface";
+import MenuIconButton from "@/presentation/theme/components/MenuIconButton";
 
 const ProductScreen = () => {
   const navigation = useNavigation();
@@ -25,7 +25,7 @@ const ProductScreen = () => {
 
   useEffect(() => {
     navigation.setOptions({
-      headerRight: () => <Ionicons name="camera-outline" size={25} />,
+      headerRight: () => <MenuIconButton />,
     });
   }, []);
 
