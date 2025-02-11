@@ -6,8 +6,12 @@ import {
   ActivityIndicator,
 } from "react-native";
 import React, { useEffect } from "react";
-import { Redirect, useLocalSearchParams, useNavigation } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
+import {
+  Redirect,
+  router,
+  useLocalSearchParams,
+  useNavigation,
+} from "expo-router";
 import { ThemedView } from "@/presentation/theme/components/ThemedView";
 import ThemedTextInput from "@/presentation/theme/components/ThemedTextInput";
 import { useProduct } from "../../../presentation/products/hooks/useProduct";
@@ -25,7 +29,12 @@ const ProductScreen = () => {
 
   useEffect(() => {
     navigation.setOptions({
-      headerRight: () => <MenuIconButton />,
+      headerRight: () => (
+        <MenuIconButton
+          onPress={() => router.push("/camera")}
+          icon="camera-outline"
+        />
+      ),
     });
   }, []);
 
@@ -135,7 +144,7 @@ const ProductScreen = () => {
               }}
             >
               <ThemedButton icon="save-outline" onPress={() => handleSubmit()}>
-                Guardar
+                Guardarr
               </ThemedButton>
             </View>
           </ScrollView>

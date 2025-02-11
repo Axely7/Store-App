@@ -1,6 +1,7 @@
 import { View, Text, TouchableOpacity } from "react-native";
 import React from "react";
 import { Ionicons } from "@expo/vector-icons";
+import { useThemeColor } from "../hooks/useThemeColor";
 
 interface Props {
   onPress: () => void;
@@ -8,9 +9,11 @@ interface Props {
 }
 
 const MenuIconButton = ({ onPress, icon }: Props) => {
+  const primaryColor = useThemeColor({}, "primary");
+
   return (
-    <TouchableOpacity>
-      <Ionicons name={icon} size={24} />
+    <TouchableOpacity onPress={onPress}>
+      <Ionicons name={icon} size={24} color={primaryColor} />
     </TouchableOpacity>
   );
 };
