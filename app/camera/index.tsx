@@ -3,6 +3,8 @@ import { CameraView, CameraType, useCameraPermissions } from "expo-camera";
 import { useRef, useState } from "react";
 import { useThemeColor } from "../../presentation/theme/hooks/useThemeColor";
 import {
+  Alert,
+  Image,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -10,18 +12,51 @@ import {
   View,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
+import * as MediaLibrary from "expo-media-library";
 
 export default function CameraScreen() {
   const [facing, setFacing] = useState<CameraType>("back");
-  const [permission, requestPermission] = useCameraPermissions();
+  const [cameraPermission, requestCameraPermission] = useCameraPermissions();
+  const [mediaPermission, requestMediaPermission] =
+    MediaLibrary.usePermissions();
+  const [selectedImage, setSelectedImage] = useState<string>();
   const cameraRef = useRef<CameraView>(null);
 
-  if (!permission) {
+  const onRequestPermissions = async () => {
+    try {
+      const { status: cameraPermissionStatus } =
+        await requestCameraPermission();
+
+      if (cameraPermissionStatus !== "granted") {
+        Alert.alert(
+          "Lo siento",
+          "Necesitamos permiso a la cámara para tomar fotos"
+        );
+        return;
+      }
+
+      const { status: mediaPermissionStatus } = await requestMediaPermission();
+
+      if (mediaPermissionStatus !== "granted") {
+        Alert.alert(
+          "Lo siento",
+          "Necesitamos permiso a la galería para guardar las imagénes"
+        );
+        return;
+      }
+    } catch (error) {
+      console.log(error);
+      Alert.alert("Error", "Algo salió mal con los permisos");
+    }
+  };
+
+  if (!cameraPermission) {
     // Camera permissions are still loading.
     return <View />;
   }
 
-  if (!permission.granted) {
+  if (!cameraPermission.granted) {
     // Camera permissions are not granted yet.
     return (
       <View
@@ -35,7 +70,7 @@ export default function CameraScreen() {
         <Text style={styles.message}>
           Necesitamos permiso para usar la cámara y la galería
         </Text>
-        <TouchableOpacity onPress={requestPermission}>
+        <TouchableOpacity onPress={onRequestPermissions}>
           <ThemedText type="subtitle">Solicitar permiso</ThemedText>
         </TouchableOpacity>
       </View>
@@ -52,16 +87,43 @@ export default function CameraScreen() {
     console.log(picture);
 
     if (!picture?.uri) return;
+
+    setSelectedImage(picture.uri);
+  };
+
+  const onReturnCancel = () => {
+    router.dismiss();
+  };
+
+  const onPictureAccepted = async () => {
+    if (!selectedImage) return;
+
+    await MediaLibrary.createAssetAsync(selectedImage);
+
+    router.dismiss();
   };
 
   function toggleCameraFacing() {
     setFacing((current) => (current === "back" ? "front" : "back"));
   }
 
+  if (selectedImage) {
+    return (
+      <View style={styles.container}>
+        <Image source={{ uri: selectedImage }} style={styles.camera} />
+        <ConfirmImageButton onPress={onPictureAccepted} />
+        <RetakeImageButton onPress={() => setSelectedImage(undefined)} />
+        <ReturnCancelButton onPress={onReturnCancel} />
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <CameraView ref={cameraRef} style={styles.camera} facing={facing}>
         <ShutterButton onPress={onShutterButtonPress} />
+        <GalleryButton />
+        <ReturnCancelButton onPress={onReturnCancel} />
         <FlipCameraButton onPress={toggleCameraFacing} />
       </CameraView>
     </View>
@@ -92,6 +154,52 @@ const FlipCameraButton = ({ onPress = () => {} }) => {
   return (
     <TouchableOpacity onPress={onPress} style={styles.flipCameraButton}>
       <Ionicons name="camera-reverse-outline" size={30} color={"white"} />
+    </TouchableOpacity>
+  );
+};
+
+const GalleryButton = ({ onPress = () => {} }) => {
+  return (
+    <TouchableOpacity onPress={onPress} style={styles.galleryButton}>
+      <Ionicons name="images-outline" size={30} color={"white"} />
+    </TouchableOpacity>
+  );
+};
+
+const ReturnCancelButton = ({ onPress = () => {} }) => {
+  return (
+    <TouchableOpacity onPress={onPress} style={styles.returnCancelButton}>
+      <Ionicons name="arrow-back-outline" size={30} color={"white"} />
+    </TouchableOpacity>
+  );
+};
+
+const ConfirmImageButton = ({ onPress = () => {} }) => {
+  const dimensions = useWindowDimensions();
+  const primaryColor = useThemeColor({}, "primary");
+
+  return (
+    <TouchableOpacity
+      onPress={onPress}
+      style={[
+        styles.shutterButton,
+        {
+          position: "absolute",
+          bottom: 30,
+          left: dimensions.width / 2 - 32,
+          borderColor: primaryColor,
+        },
+      ]}
+    >
+      <Ionicons name="checkbox-outline" size={30} color={primaryColor} />
+    </TouchableOpacity>
+  );
+};
+
+const RetakeImageButton = ({ onPress = () => {} }) => {
+  return (
+    <TouchableOpacity onPress={onPress} style={styles.flipCameraButton}>
+      <Ionicons name="close-outline" size={30} color={"white"} />
     </TouchableOpacity>
   );
 };
