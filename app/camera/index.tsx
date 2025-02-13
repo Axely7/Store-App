@@ -14,8 +14,11 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import * as MediaLibrary from "expo-media-library";
+import { useCameraStore } from "../../presentation/store/useCameraStore";
+import * as ImagePicker from "expo-image-picker";
 
 export default function CameraScreen() {
+  const { addSelectedImage } = useCameraStore();
   const [facing, setFacing] = useState<CameraType>("back");
   const [cameraPermission, requestCameraPermission] = useCameraPermissions();
   const [mediaPermission, requestMediaPermission] =
@@ -100,6 +103,24 @@ export default function CameraScreen() {
 
     await MediaLibrary.createAssetAsync(selectedImage);
 
+    addSelectedImage(selectedImage);
+
+    router.dismiss();
+  };
+
+  const onPickImages = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images"],
+      quality: 0.5,
+      aspect: [4, 3],
+      allowsEditing: true,
+      allowsMultipleSelection: true,
+      selectionLimit: 5,
+    });
+
+    if (result.canceled) return;
+
+    result.assets.forEach((image) => addSelectedImage(image.uri));
     router.dismiss();
   };
 
@@ -122,7 +143,7 @@ export default function CameraScreen() {
     <View style={styles.container}>
       <CameraView ref={cameraRef} style={styles.camera} facing={facing}>
         <ShutterButton onPress={onShutterButtonPress} />
-        <GalleryButton />
+        <GalleryButton onPress={onPickImages} />
         <ReturnCancelButton onPress={onReturnCancel} />
         <FlipCameraButton onPress={toggleCameraFacing} />
       </CameraView>
